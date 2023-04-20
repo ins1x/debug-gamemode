@@ -47,8 +47,6 @@ main()
 public OnPlayerConnect(playerid)
 {
     GameTextForPlayer(playerid, "~w~SA-MP: ~r~Debug ~y~Gamemode ", 5000, 5);
-    SendClientMessage(playerid, -1, "Available commands:");
-    SendClientMessage(playerid, -1, "/spawn /jetpack /time /weather");
     return 1;
 }
 
@@ -82,32 +80,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
         {
             SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
         }
-        return true;
-    }
-    
-    if (!strcmp("/weather", cmd, true))
-    {
-        cmd = strtok(cmdtext, idx);
-        if (!strlen(cmd) || strval(cmd) > 255)
-        {
-            SendClientMessage(playerid, -1, "Use: /weather [weather ID]");
-            return true;
-        }
-        
-        SetPlayerWeather(playerid, strval(cmd)); 
-        return true;
-    }
-    
-    if (!strcmp("/time", cmd, true))
-    {
-        cmd = strtok(cmdtext, idx);
-        if (!strlen(cmd) || strval(cmd) > 23 )
-        {
-            SendClientMessage(playerid, -1, "Use: /time [hour]");
-            return true;
-        }
-        
-        SetPlayerTime(playerid, strval(cmd), 0); 
         return true;
     }
     
@@ -155,7 +127,6 @@ public OnGameModeInit()
     AllowInteriorWeapons(true);
     ShowPlayerMarkers(true);
     // ShowNameTags(true); Enabled by default
-    // LimitPlayerMarkerRadius(250.0);
     EnableStuntBonusForAll(false);
     DisableInteriorEnterExits();
     

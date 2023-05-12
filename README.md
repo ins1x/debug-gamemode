@@ -6,7 +6,7 @@ Perfect if you need to quickly deploy a samp server and test any system.
 ### Configure
 - Check before run [server.cfg](https://open.mp/docs/server/server.cfg) configfile.  
 - Compile your script with [debug info](https://github.com/Zeex/samp-plugin-crashdetect/wiki/Compiling-scripts-with-debug-info).
-- CrashDetect does not work in conjunction with Profiler and JIT plugins, only one of them can be used!
+- Crashdetect [does not work in conjunction with Profiler and JIT plugins](https://github.com/Zeex/samp-plugin-crashdetect), only one of them can be used!
 
 ### Contain plugins
 * [Crashdetect 4.19 plugin](https://github.com/Zeex/samp-plugin-crashdetect/releases)
@@ -15,7 +15,7 @@ Perfect if you need to quickly deploy a samp server and test any system.
 
 ### Filterscripts
 Contains only the necessary filterscripts:
-- [afly](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/afly.pwn),
+[afly](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/afly.pwn),
 [attachments](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/attachments.pwn),
 [flymode](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/flymode.pwn),
 [fs_cmds](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/fs_cmds.pwn),
@@ -24,6 +24,7 @@ Contains only the necessary filterscripts:
 [netstats](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/netstats.pwn),
 [npc_record](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/npc_record.pwn),
 [ospawner](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/ospawner.pwn),
+  
 [pnetstats](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/pnetstats.pwn),
 [samp_anims](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/samp_anims.pwn),
 [skinchanger](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/skinchanger.pwn),
@@ -33,5 +34,5 @@ Contains only the necessary filterscripts:
 [vspawner](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/vspawner.pwn)
 
 ### Default commands
-* /respawn, /class, /kill, /slapme, /jetpack, /tpc  
+**/respawn, /class, /kill, /slapme, /jetpack, /tpc**  
 > To use more loadfs  **[test_cmds](https://github.com/ins1x/debug-gamemode/blob/main/filterscripts/test_cmds.pwn)**  

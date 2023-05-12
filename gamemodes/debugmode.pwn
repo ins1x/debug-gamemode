@@ -1,7 +1,7 @@
 /*
     Gamemode: Debugmode
     Description: Simple gamemode created for debugging
-    Git: https://github.com/ins1x/useful-samp-stuff
+    Git: https://github.com/ins1x/debug-gamemode/
 */
 
 // ----------------------------------------------------------------------------
@@ -10,7 +10,8 @@
 // https://github.com/Zeex/samp-plugin-crashdetect/wiki/Compiling-scripts-with-debug-info   
 // Below is a list of callbacks available in SA-MP and its call sequence:
 // https://open.mp/docs/scripting/resources/callbacks-sequence
-
+// Controlling a SAMP Server
+// https://www.open.mp/docs/server/ControllingServer
 // ----------------------------------------------------------------------------
 
 #include <a_samp>
@@ -39,10 +40,10 @@
 // ignore literal array/string passed to a non-const parameter
 // #pragma warning disable 239
 
-main()
-{
-    print("Debug Gamemode\n");
-}
+// Toggle debug messages on console
+#if !defined DEBUGMSG
+    #define DEBUGMSG
+#endif
 
 public OnPlayerConnect(playerid)
 {
@@ -53,7 +54,7 @@ public OnPlayerConnect(playerid)
 public OnPlayerCommandText(playerid, cmdtext[])
 {
     new idx;
-    new cmd[256];
+    new cmd[256], tmp[128];
     
     cmd = strtok(cmdtext, idx);
     
@@ -83,6 +84,48 @@ public OnPlayerCommandText(playerid, cmdtext[])
         return true;
     }
     
+    if (!strcmp(cmdtext, "/kill", true))
+    {
+        SetPlayerHealth(playerid, 0.0);
+        return true;
+    }
+    
+    if (!strcmp(cmdtext, "/class", true))
+    {
+        ForceClassSelection(playerid);
+        return true;
+    }
+    
+    if (!strcmp(cmdtext, "/slapme", true)) 
+    {
+        new Float: x, Float: y, Float: z;
+        GetPlayerPos(playerid, x, y, z);
+        SetPlayerPos(playerid, x + 1, y + 1, z + 1.5);
+        PlayerPlaySound(playerid, 1130, x, y, z); // PUNCH_PED
+        return true;
+    }
+    
+    if (!strcmp("/tpc", cmd, true) || !strcmp("/tpcoord", cmd, true))
+    {
+        tmp = strtok(cmdtext, idx);
+        
+        if (strlen(tmp) == 0) {
+            return SendClientMessage(playerid, -1, "Use: /tpc x y z");
+        }
+        
+        new px = strval(tmp);
+        tmp = strtok(cmdtext, idx);
+        if (strlen(tmp) == 0) return SendClientMessage(playerid, -1, "Use: /tpc x y z");
+        new py = strval(tmp);
+    
+        tmp = strtok(cmdtext, idx);
+        if (strlen(tmp) == 0) return SendClientMessage(playerid, -1, "Use: /tpc x y z");
+        new pz = strval(tmp);
+        
+        SetPlayerPos(playerid, px, py, pz);
+        return true;
+    }
+    
     // sscanf cmd example
     // if (sscanf(params, "ui", giveplayerid, amount))
     // {
@@ -95,14 +138,75 @@ public OnPlayerCommandText(playerid, cmdtext[])
 public OnPlayerSpawn(playerid)
 {
     SetPlayerInterior(playerid, 0);
+    
+    #if defined DEBUGMSG
+        new skinid = GetPlayerSkin(playerid);
+        new Float: x, Float: y, Float: z;
+        GetPlayerPos(playerid, x, y, z);
+        printf("[debug] playerid: %d, skinid: %d, x: %.2f, y: %.2f, z: %.2f",
+        playerid, skinid, x, y, z);
+    #endif
+    return 1;
+}
+
+public OnPlayerStateChange(playerid, newstate, oldstate)
+{
+    #if defined DEBUGMSG
+        printf("[debug] playerid %d, newstate: %d, oldstate: %d",
+        playerid, newstate, oldstate);
+    #endif
+    return 1;
+}
+
+public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
+{
+    #if defined DEBUGMSG
+        new worldid = GetPlayerVirtualWorld(playerid);
+        printf("[debug] playerid %d, newinteriorid: %d, oldinteriorid: %d, worldid: %d",
+        playerid, newinteriorid, oldinteriorid, worldid);
+    #endif
     return 1;
 }
 
 public OnPlayerDeath(playerid, killerid, reason)
 {
-    //GameTextForPlayer(playerid, "~w~Wasted", 5000, 3);
+    // Shows the kill in the killfeed
+    SendDeathMessage(killerid, playerid, reason);
+
+    if(killerid != INVALID_PLAYER_ID)
+    {
+        #if defined DEBUGMSG
+            printf("[debug] Is dead playerid: %d, killerid: %d, reason: %d",
+            playerid, killerid, reason);
+        #endif
+    }
     return 1;
 }
+
+public OnPlayerTakeDamage(playerid, issuerid, Float: amount, weaponid, bodypart)
+{
+    if(issuerid != INVALID_PLAYER_ID)
+    {
+        #if defined DEBUGMSG
+            printf("[debug] Issuerid: %d, amount: %f, weaponid: %d, bodypart: %d",
+            issuerid, amount, weaponid, bodypart);
+        #endif
+    }
+    return 1;
+}
+
+public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
+{
+    if (playerid != INVALID_PLAYER_ID)
+    {
+        #if defined DEBUGMSG
+            printf("[debug] Hittype: %d, hitid: %d, weaponid: %d",
+            hittype, hitid, weaponid);
+        #endif
+    }
+    return 1;
+}
+
 
 public OnPlayerRequestClass(playerid, classid)
 {
@@ -112,6 +216,11 @@ public OnPlayerRequestClass(playerid, classid)
     SetPlayerFacingAngle(playerid, 270.0);
     SetPlayerCameraPos(playerid,256.0815,-43.0475,1004.0234);
     SetPlayerCameraLookAt(playerid,258.4893,-41.4008,1002.0234);
+    
+    #if defined DEBUGMSG
+        printf("[debug] playerid: %d select classid: %d", playerid, classid);
+    #endif
+    
     return 1;
 }
 
@@ -119,9 +228,11 @@ public OnGameModeInit()
 {
     SetGameModeText("Debug Gamemode");
     
-    new heap_free = heapspace(); 
-    printf("Stack/heap free %d bytes", heap_free);
-    if (heap_free > 16384) printf("Used \"#pragma dynamic\" bytes");
+    #if defined DEBUGMSG
+        new heap_free = heapspace(); 
+        printf("Stack/heap free %d bytes", heap_free);
+        if (heap_free > 16384) printf("Used \"#pragma dynamic\" bytes");
+    #endif
     
     UsePlayerPedAnims();
     AllowInteriorWeapons(true);
@@ -139,7 +250,9 @@ public OnGameModeInit()
     // Profiler plugin dump call
     // Profiler_Dump();
     
-    print("Gamemode init complete \t[OK]\n");
+    #if defined DEBUGMSG
+        print("Gamemode init complete \t[OK]\n");
+    #endif
     return 1;
 }
 

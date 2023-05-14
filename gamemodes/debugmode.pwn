@@ -45,9 +45,23 @@
     #define DEBUGMSG
 #endif
 
-public OnPlayerConnect(playerid)
+public OnPlayerDisconnect(playerid, reason)
 {
-    GameTextForPlayer(playerid, "~w~SA-MP: ~r~Debug ~y~Gamemode ", 5000, 5);
+    #if defined DEBUGMSG
+        new nickname[MAX_PLAYER_NAME];
+        GetPlayerName(playerid, nickname, sizeof(nickname));
+        
+        new szDisconnectReason[5][] =
+        {
+            "Timeout/Crash",
+            "Quit",
+            "Kick/Ban",
+            "Custom",
+            "Mode End"
+        };
+        
+        printf("[debug] %s left the server. (Reason: %s)", nickname, szDisconnectReason[reason]);
+    #endif
     return 1;
 }
 
@@ -57,6 +71,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
     new cmd[256], tmp[128];
     
     cmd = strtok(cmdtext, idx);
+    
+    #if defined DEBUGMSG
+        new nickname[MAX_PLAYER_NAME];
+        GetPlayerName(playerid, nickname, sizeof(nickname));
+        printf("[cmd] [%s]: %s", nickname, cmdtext);
+    #endif
     
     if(!strcmp(cmdtext, "/respawn", true) || !strcmp(cmdtext, "/spawn", true))
     {
